@@ -26,17 +26,38 @@ end
 
 # Get resource from Delicious API
 page = begin
-  agent.post("#{API}posts/all?tag=ruby&results=10", {}, {"Authorization" => "Bearer #{ACCESS_TOKEN}"})
+  agent.post("#{API}posts/all?tag=programming&results=5", {}, {"Authorization" => "Bearer #{ACCESS_TOKEN}"})
 rescue Mechanize::ResponseCodeError => exception
   puts exception.inspect if exception.respond_to? :inspect
 end
 
 # Print results
 unless page.nil?
-	puts "Here's what you got ..."
+  include REXML
+  doc = Document.new page.body
+	# out = ""
+	# doc.write(out, 4)
+  # puts out
+
+  tag = doc.elements[1].attributes["tag"]
+  total = doc.elements[1].attributes["total"]
+  user = doc.elements[1].attributes["user"]
+  
+  puts "User `#{user}' has #{total} posts."
   puts
-  doc = REXML::Document.new page.body
-	out = ""
-	doc.write(out, 4)
-  puts out
+
+  puts "Found posts for tag `#{tag}' ..."
+  puts
+
+  doc.elements.each("posts/post") do |element|
+    description = element.attributes["description"]
+    href = element.attributes["href"]
+    time = element.attributes["time"]
+    tag = element.attributes["tag"]
+
+    puts "#{time}: #{description}"
+    puts ">> #{href}"
+    puts "tags: #{tag}"
+    puts
+  end
 end
