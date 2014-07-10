@@ -5,10 +5,49 @@ require 'mechanize'
 require 'logger'
 require 'yaml'
 require 'rexml/document'
+require 'optparse'
 
-puts "Hello, Yummy! You're just looking delicious ..."
 
 API = "https://api.del.icio.us/v1/"
+
+# Parse command line options
+options = {:tags => "programming", :max => 10}
+
+opt_parser = OptionParser.new do |opts|
+  opts.banner =   "Usage: ./yummy.rb [OPTIONS]"
+  opts.separator  ""
+  opts.separator  "OPTIONS"
+
+  opts.on("-t", "--tags TAGS", "Set tags for posts") do |d|
+    options[:tags] = d
+  end
+
+  opts.on("-n", "--max MAX", "Set maximum number of posts") do |d|
+    options[:max] = d
+  end
+
+  opts.on("-s", "--start-date START_DATE", "Set start date for all API requests") do |d|
+    options[:start] = d
+  end
+
+  opts.on("-e", "--end-date END_DATE", "Set end date for all API requests") do |d|
+    options[:end] = d
+  end
+
+  opts.on("-h", "--help", "Display this information") do
+    puts opt_parser
+    exit 0
+  end
+
+  opts.separator  ""
+  opts.separator  "** All dates must be provided in the format `yyyy-mm-dd'"
+  opts.separator  ""
+end
+opt_parser.parse!
+
+
+# Greet user
+puts "Hello, Yummy! You're just looking delicious ..."
 
 # Load ACCESS_TOKEN
 config = begin
@@ -26,7 +65,7 @@ end
 
 # Get resource from Delicious API
 page = begin
-  agent.post("#{API}posts/all?tag=programming&results=5", {}, {"Authorization" => "Bearer #{ACCESS_TOKEN}"})
+  agent.post("#{API}posts/all?tag=#{options[:tags]}&results=#{options[:max]}", {}, {"Authorization" => "Bearer #{ACCESS_TOKEN}"})
 rescue Mechanize::ResponseCodeError => exception
   puts exception.inspect if exception.respond_to? :inspect
 end
@@ -46,7 +85,7 @@ unless page.nil?
   puts "User `#{user}' has #{total} posts."
   puts
 
-  puts "Found posts for tag `#{tag}' ..."
+  puts "Found posts for tags `#{tag}' ..."
   puts
 
   doc.elements.each("posts/post") do |element|
