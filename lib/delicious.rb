@@ -18,12 +18,16 @@ class DeliciousAPI
 		end
 	end
 
+
+	# /v1/tags/get
+	# https://github.com/SciDevs/delicious-api/blob/master/api/tags.md#v1tagsget
 	def get_tags_uri
 		"#{@@API}tags/get"
 	end
 
 	def get_tags
-		response = request(get_tags_uri)
+		uri = get_tags_uri
+		response = request uri
 		return nil if response.nil?
 		
 		doc = Document.new response.body
@@ -39,6 +43,8 @@ class DeliciousAPI
  		tags
 	end
 
+	# /v1/posts/all?
+	# https://github.com/SciDevs/delicious-api/blob/master/api/posts.md#v1postsall
 	def get_posts_uri(tags, max, start_date, end_date)
 		uri = "#{@@API}posts/all?tag=#{tags}&results=#{max}"
 		uri += "&fromdt=#{start_date}" unless start_date.nil?
@@ -75,6 +81,33 @@ class DeliciousAPI
     {:info => user, :posts => posts}
 	end
 
+	# /v1/posts/dates?
+	# https://github.com/SciDevs/delicious-api/blob/master/api/posts.md#v1postsdates
+	def get_posts_dates_uri(tag)
+		uri = "#{@@API}posts/dates"
+		uri += "?tag=#{tag}" unless tag.nil?
+		uri
+	end
+
+	def get_posts_dates(tag)
+		uri = get_posts_dates_uri tag
+		response = request uri
+		return nil if response.nil?
+
+		doc = Document.new response.body
+
+		dates = {}
+		doc.elements.each("dates/date") do |element|
+			dt    = element.attributes["date"]
+			count = element.attributes["count"]
+
+			dates[dt] = count
+		end
+
+		dates
+	end
+
+private
 	def request(uri)
 		page = begin
 		  @agent.post(uri, {}, {"Authorization" => "Bearer #{@access_token}"})

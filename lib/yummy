@@ -14,7 +14,7 @@ opt_parser = OptionParser.new do |opts|
   opts.separator  ""
   opts.separator  "OPTIONS"
 
-  opts.on("-o", "--object (tags|posts)", "Choose between list of 'tags' or 'posts'") do |d|
+  opts.on("-o", "--object (tags|posts|dates)", "Choose between list of 'tags', 'posts' or 'posts/dates'") do |d|
     options[:object] = d
   end
 
@@ -75,6 +75,24 @@ if options[:object] == "tags"
   n = i < options[:max] ? i : options[:max]
   puts
   puts "Found (#{i-1}) tags. Shown only first (#{n})."
+  puts "URL: #{uri}"
+  puts
+
+elsif options[:object] == "dates"
+  uri   = manager.get_posts_dates_uri options[:tags]
+  dates = manager.get_posts_dates options[:tags]
+
+  exit -1 if dates.nil?
+
+  i = 1
+  dates.sort{|a, b| b <=> a}.each do |dt, count|
+    puts "[#{i}]\tdate: #{dt}\tcount: #{count}" unless i > options[:max]
+    i += 1
+  end
+
+  n = i < options[:max] ? i : options[:max]
+  puts
+  puts "Found (#{i-1}) post dates. Shown only first (#{n})."
   puts "URL: #{uri}"
   puts
 
