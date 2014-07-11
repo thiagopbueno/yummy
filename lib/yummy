@@ -1,0 +1,109 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'yaml'
+require 'optparse'
+
+require_relative 'delicious'
+
+# Parse command line options
+options = {:object => "posts", :tags => "programming", :max => 5}
+
+opt_parser = OptionParser.new do |opts|
+  opts.banner =   "Usage: ./yummy [OPTIONS]"
+  opts.separator  ""
+  opts.separator  "OPTIONS"
+
+  opts.on("-o", "--object (tags|posts)", "Choose between list of 'tags' or 'posts'") do |d|
+    options[:object] = d
+  end
+
+  opts.on("-t", "--tags tag1+tag2+...", "Set list of tags (separated by '+') for posts") do |d|
+    options[:tags] = d
+  end
+
+  opts.on("-n", "--max MAX", "Set maximum number of tags/posts") do |d|
+    options[:max] = d.to_i
+  end
+
+  opts.on("-s", "--start-date START_DATE", "Set start date for all API requests") do |d|
+    options[:start] = Date.parse(d).strftime("%FT%TZ")
+  end
+
+  opts.on("-e", "--end-date END_DATE", "Set end date for all API requests") do |d|
+    options[:end] = Date.parse(d).strftime("%FT%TZ")
+  end
+
+  opts.on("-h", "--help", "Display this information") do
+    puts opt_parser
+    exit 0
+  end
+
+  opts.separator  ""
+  opts.separator  "** All dates must be provided in the format `YYYY-MM-DD'"
+  opts.separator  ""
+end
+opt_parser.parse!
+
+# Greet user
+puts "Hello, Yummy! You're just looking delicious ..."
+puts
+
+# Load ACCESS_TOKEN
+config = begin
+  YAML.load(File.open("../config.yml"))
+rescue ArgumentError => e
+  puts "Could not parse YAML: #{e.message}"
+end
+
+# Initialize DeliciousAPI wrapper
+manager = DeliciousAPI.new(config['ACCESS_TOKEN'])
+
+# Print results
+if options[:object] == "tags"
+  uri  = manager.get_tags_uri
+  tags = manager.get_tags
+
+  exit -1 if tags.nil?
+
+  i = 1
+  tags.each do |tag, count|
+    puts "[#{i}]\tcount: #{count}\ttag: #{tag}" unless i > options[:max]
+    i += 1
+  end
+
+  n = i < options[:max] ? i : options[:max]
+  puts
+  puts "Found (#{i-1}) tags. Shown only first (#{n})."
+  puts "URL: #{uri}"
+  puts
+
+else
+  uri   = manager.get_posts_uri(options[:tags], options[:max], options[:start], options[:end])
+  posts = manager.get_posts(options[:tags], options[:max], options[:start], options[:end])
+
+  exit -1 if posts.nil?
+
+  puts "User `#{posts[:info][:user]}' has #{posts[:info][:total]} posts."
+  puts
+
+  i = 1
+  posts[:posts].each do |hash, post|
+    desc = post[:desc]
+    href = post[:href]
+    tags = post[:tags]
+    time = post[:dt]
+
+    puts "[#{i}]\t#{desc} @ #{time}"
+    puts "\thref: #{href}"
+    puts "\ttags: #{tags}"
+    puts
+
+    i += 1
+  end
+
+  puts "Found (#{i-1}) posts for tag(s) `#{options[:tags]}'."
+  puts "URL: #{uri}"
+  puts
+
+end
