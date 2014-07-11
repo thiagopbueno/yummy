@@ -4,7 +4,7 @@ require 'rubygems'
 require 'yaml'
 require 'optparse'
 
-require_relative 'delicious'
+require_relative 'lib/delicious'
 
 # Parse command line options
 options = {:object => "posts", :tags => "programming", :max => 5}
@@ -51,7 +51,7 @@ puts
 
 # Load ACCESS_TOKEN
 config = begin
-  YAML.load(File.open("../config.yml"))
+  YAML.load(File.open("config.yml"))
 rescue ArgumentError => e
   puts "Could not parse YAML: #{e.message}"
 end
