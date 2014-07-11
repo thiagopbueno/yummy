@@ -91,11 +91,16 @@ unless page.nil?
       if i <= options[:max]
         count = element.attributes["count"]
         tag = element.attributes["tag"]
-        puts "#{i}\t count = #{count}\t tag : #{tag}"
-        i += 1
+        puts "[#{i}]\tcount: #{count}\ttag: #{tag}"
       end
-
+      i += 1
     end
+
+    n = i < options[:max] ? i : options[:max]
+    puts
+    puts "Found (#{i}) tags. Shown only first (#{n})."
+    puts
+
   end
 
   if options[:object] == "posts"
@@ -106,19 +111,24 @@ unless page.nil?
     puts "User `#{user}' has #{total} posts."
     puts
 
-    puts "Found posts for tags `#{tag}' ..."
-    puts
-
+    i = 1
     doc.elements.each("posts/post") do |element|
       description = element.attributes["description"]
       href = element.attributes["href"]
       time = element.attributes["time"]
-      tag = element.attributes["tag"]
+      tags = element.attributes["tag"]
 
-      puts "#{time}: #{description}"
+      puts "[#{i}]\t#{description} @ #{time}"
       puts ">> #{href}"
-      puts "tags: #{tag}"
+      puts "tags: #{tags}"
       puts
+
+      i += 1
     end
+
+    puts
+    puts "Found (#{i-1}) posts for tag(s) `#{tag}'."
+    puts
+
   end
 end
