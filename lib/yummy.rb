@@ -31,11 +31,11 @@ opt_parser = OptionParser.new do |opts|
   end
 
   opts.on("-s", "--start-date START_DATE", "Set start date for all API requests") do |d|
-    options[:start] = d
+    options[:start] = Date.parse(d).strftime("%FT%TZ")
   end
 
   opts.on("-e", "--end-date END_DATE", "Set end date for all API requests") do |d|
-    options[:end] = d
+    options[:end] = Date.parse(d).strftime("%FT%TZ")
   end
 
   opts.on("-h", "--help", "Display this information") do
@@ -68,8 +68,19 @@ agent = Mechanize.new do |agent|
 end
 
 # Get resource from Delicious API
-request = "#{API}tags/get"
-request = "#{API}posts/all?tag=#{options[:tags]}&results=#{options[:max]}" unless options[:object] == "tags"
+if options[:object] == "tags"
+  request = "#{API}tags/get"
+else
+  request = "#{API}posts/all?tag=#{options[:tags]}&results=#{options[:max]}"
+
+  unless options[:start].nil?
+    request += "&fromdt=#{options[:start]}"
+  end
+
+  unless options[:end].nil?
+    request += "&todt=#{options[:end]}"
+  end
+end
 
 page = begin
   agent.post(request, {}, {"Authorization" => "Bearer #{ACCESS_TOKEN}"})
@@ -99,6 +110,7 @@ unless page.nil?
     n = i < options[:max] ? i : options[:max]
     puts
     puts "Found (#{i}) tags. Shown only first (#{n})."
+    puts "URL: #{request}"
     puts
 
   end
@@ -127,7 +139,8 @@ unless page.nil?
     end
 
     puts
-    puts "Found (#{i-1}) posts for tag(s) `#{tag}'."
+    puts "Found (#{i-1}) posts for tag(s) `#{options[:tags]}'."
+    puts "URL: #{request}"
     puts
 
   end
