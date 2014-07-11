@@ -11,18 +11,18 @@ require 'optparse'
 API = "https://api.del.icio.us/v1/"
 
 # Parse command line options
-options = {:object => "posts", :tags => "programming", :max => 10}
+options = {:object => "posts", :tags => "programming", :max => 5}
 
 opt_parser = OptionParser.new do |opts|
   opts.banner =   "Usage: ./yummy.rb [OPTIONS]"
   opts.separator  ""
   opts.separator  "OPTIONS"
 
-  opts.on("-o", "--object (tags|posts)", "Choose between list of tags or list of posts") do |d|
+  opts.on("-o", "--object (tags|posts)", "Choose between list of 'tags' or 'posts'") do |d|
     options[:object] = d
   end
 
-  opts.on("-t", "--tags TAGS", "Set tags for posts") do |d|
+  opts.on("-t", "--tags tag1+tag2+...", "Set list of tags (separated by '+') for posts") do |d|
     options[:tags] = d
   end
 
@@ -44,7 +44,7 @@ opt_parser = OptionParser.new do |opts|
   end
 
   opts.separator  ""
-  opts.separator  "** All dates must be provided in the format `yyyy-mm-dd'"
+  opts.separator  "** All dates must be provided in the format `YYYY-MM-DD'"
   opts.separator  ""
 end
 opt_parser.parse!
