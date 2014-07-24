@@ -160,4 +160,7 @@ elsif options[:object] == "backup"
 
     i += 1
   end
+
+  puts "Found (#{i-1}) posts."
+  puts
 end
