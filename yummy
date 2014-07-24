@@ -7,7 +7,8 @@ require 'optparse'
 require_relative 'lib/delicious'
 
 # Parse command line options
-options = {:object => "posts", :tags => "programming", :max => 5}
+
+options = {:object => "posts", :tags => nil, :max => 5}
 
 opt_parser = OptionParser.new do |opts|
   opts.banner =   "Usage: ./yummy [OPTIONS]"
@@ -44,6 +45,24 @@ opt_parser = OptionParser.new do |opts|
   opts.separator  ""
 end
 opt_parser.parse!
+
+# puts ARGV[0]
+# puts ARGV[1]
+
+command = ARGV[0]
+
+case command
+when "backup"
+  options[:object] = "backup"
+when "tags"
+  options[:object] = "tags"
+when "posts"
+  options[:object] = "posts"
+else
+  puts "yummy: don't know how to `#{command}'"
+  exit -1
+end
+
 
 # Greet user
 puts "Hello, Yummy! You're just looking delicious ..."
@@ -96,9 +115,9 @@ elsif options[:object] == "dates"
   puts "URL: #{uri}"
   puts
 
-else
-  uri   = manager.get_posts_uri(options[:tags], options[:max], options[:start], options[:end])
-  posts = manager.get_posts(options[:tags], options[:max], options[:start], options[:end])
+elsif options[:object] == "posts"
+  uri   = manager.get_posts_uri(options[:tags], options[:max], nil, options[:start], options[:end])
+  posts = manager.get_posts(options[:tags], options[:max], nil, options[:start], options[:end])
 
   exit -1 if posts.nil?
 
@@ -124,4 +143,21 @@ else
   puts "URL: #{uri}"
   puts
 
+elsif options[:object] == "backup"
+  posts = manager.get_all_posts options[:tags]
+
+  i = 1
+  posts.each do |hash, post|
+    desc = post[:desc]
+    href = post[:href]
+    tags = post[:tags]
+    time = post[:dt]
+
+    puts "[#{i}]\t#{desc} @ #{time}"
+    puts "\thref: #{href}"
+    puts "\ttags: #{tags}"
+    puts
+
+    i += 1
+  end
 end

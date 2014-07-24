@@ -19,6 +19,26 @@ class DeliciousAPI
 	end
 
 
+	def get_all_posts(tags)
+		all_posts = {}
+
+		start = 0
+
+		posts = get_posts tags, 1000, start, nil, nil
+		posts = posts[:posts]
+
+		while posts.size > 0
+
+			all_posts.merge! posts
+
+			start += 1000
+			posts = get_posts tags, 1000, start, nil, nil
+			posts = posts[:posts]
+		end
+
+		all_posts
+	end
+
 	# /v1/tags/get
 	# https://github.com/SciDevs/delicious-api/blob/master/api/tags.md#v1tagsget
 	def get_tags_uri
@@ -34,10 +54,10 @@ class DeliciousAPI
 
 		tags = {}
 		doc.elements.each("tags/tag") do |element|
-      count = element.attributes["count"]
-      tag   = element.attributes["tag"]
-      
-      tags[tag] = count
+	      	count = element.attributes["count"]
+	      	tag   = element.attributes["tag"]
+	      
+	      	tags[tag] = count
  		end
  		
  		tags
@@ -45,40 +65,44 @@ class DeliciousAPI
 
 	# /v1/posts/all?
 	# https://github.com/SciDevs/delicious-api/blob/master/api/posts.md#v1postsall
-	def get_posts_uri(tags, max, start_date, end_date)
-		uri = "#{@@API}posts/all?tag=#{tags}&results=#{max}"
-		uri += "&fromdt=#{start_date}" unless start_date.nil?
-		uri += "&todt=#{end_date}"     unless end_date.nil?
+	def get_posts_uri(tags, max, start, fromdt, todt)
+		uri = "#{@@API}posts/all?"
+		uri += "tag=#{tags}&" 		unless tags.nil?
+		uri += "results=#{max}&"    unless max.nil?
+		uri += "start=#{start}&"    unless start.nil?
+		uri += "fromdt=#{fromdt}&" 	unless fromdt.nil?
+		uri += "todt=#{todt}"     	unless todt.nil?
+		#puts uri
 		uri
 	end
 
-	def get_posts(tags, max, start_date, end_date)
-		uri = get_posts_uri tags, max, start_date, end_date
+	def get_posts(tags, max, start, fromdt, todt)
+		uri = get_posts_uri tags, max, start, fromdt, todt
 		response = request uri
 		return nil if response.nil?
 
 		doc = Document.new response.body
-	  # out = ""
-	  # doc.write(out, 4)
-  	# puts out
+		# out = ""
+		# doc.write(out, 4)
+	  	# puts out
 
-    user = {
-    	:user  => doc.elements[1].attributes["user"],
-    	:total => doc.elements[1].attributes["total"],
-    	:tag   => doc.elements[1].attributes["tag"]
-    }
+	    user = {
+	    	:user  => doc.elements[1].attributes["user"],
+	    	:total => doc.elements[1].attributes["total"],
+	    	:tag   => doc.elements[1].attributes["tag"]
+	    }
 
-    posts = {}
-    doc.elements.each("posts/post") do |element|
-      posts[element.attributes["hash"]] = {
-      	:desc => element.attributes["description"],
-      	:href => element.attributes["href"],
-      	:tags => element.attributes["tag"],
-      	:dt   => element.attributes["time"]
-      }
-    end
+	    posts = {}
+	    doc.elements.each("posts/post") do |element|
+	      posts[element.attributes["hash"]] = {
+	      	:desc => element.attributes["description"],
+	      	:href => element.attributes["href"],
+	      	:tags => element.attributes["tag"],
+	      	:dt   => element.attributes["time"]
+	      }
+    	end
 
-    {:info => user, :posts => posts}
+    	{:info => user, :posts => posts}
 	end
 
 	# /v1/posts/dates?
