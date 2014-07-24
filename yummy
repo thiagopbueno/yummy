@@ -146,6 +146,10 @@ elsif options[:object] == "posts"
 elsif options[:object] == "backup"
   posts = manager.get_all_posts options[:tags]
 
+  File.open("delicious-backup-#{Time.now.strftime("%F_%H-%M-%S")}.yml", "w") do |f|
+    f.write(posts.to_yaml)
+  end
+
   i = 1
   posts.each do |hash, post|
     desc = post["desc"]
