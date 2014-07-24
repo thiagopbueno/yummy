@@ -68,11 +68,11 @@ class DeliciousAPI
 	def get_posts_uri(tags, max, start, fromdt, todt)
 		uri = "#{@@API}posts/all?"
 		uri += "tag=#{tags}&" 		unless tags.nil?
-		uri += "results=#{max}&"    unless max.nil?
-		uri += "start=#{start}&"    unless start.nil?
+		uri += "results=#{max}&"	unless max.nil?
+		uri += "start=#{start}&"	unless start.nil?
 		uri += "fromdt=#{fromdt}&" 	unless fromdt.nil?
 		uri += "todt=#{todt}"     	unless todt.nil?
-		#puts uri
+
 		uri
 	end
 
@@ -82,9 +82,6 @@ class DeliciousAPI
 		return nil if response.nil?
 
 		doc = Document.new response.body
-		# out = ""
-		# doc.write(out, 4)
-	  	# puts out
 
 		info = {
 			"user"  => doc.elements[1].attributes["user"],
@@ -139,7 +136,7 @@ private
 		  puts exception.inspect if exception.respond_to? :inspect
 		  return nil
 		end
+
 		page
 	end
-
 end
