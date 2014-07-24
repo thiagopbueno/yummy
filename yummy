@@ -54,6 +54,8 @@ command = ARGV[0]
 case command
 when "backup"
   options[:object] = "backup"
+when "dates"
+  options[:object] = "dates"
 when "tags"
   options[:object] = "tags"
 when "posts"
