@@ -121,19 +121,19 @@ elsif options[:object] == "posts"
 
   exit -1 if posts.nil?
 
-  puts "User `#{posts[:info][:user]}' has #{posts[:info][:total]} posts."
+  puts "User `#{posts["info"]["user"]}' has #{posts["info"]["total"]} posts." unless options[:tags]
   puts
 
   i = 1
-  posts[:posts].each do |hash, post|
-    desc = post[:desc]
-    href = post[:href]
-    tags = post[:tags]
-    time = post[:dt]
+  posts["posts"].each do |hash, post|
+    desc = post["desc"]
+    href = post["href"]
+    tags = post["tags"]
+    time = post["dt"]
 
-    puts "[#{i}]\t#{desc} @ #{time}"
-    puts "\thref: #{href}"
-    puts "\ttags: #{tags}"
+    puts "[#{i}]\t\t#{desc}"
+    puts "#{time[0, 10]}\thref: #{href}"
+    puts "#{time[11..-1]}\ttags: #{tags}"
     puts
 
     i += 1
@@ -148,10 +148,10 @@ elsif options[:object] == "backup"
 
   i = 1
   posts.each do |hash, post|
-    desc = post[:desc]
-    href = post[:href]
-    tags = post[:tags]
-    time = post[:dt]
+    desc = post["desc"]
+    href = post["href"]
+    tags = post["tags"]
+    time = post["dt"]
 
     puts "[#{i}]\t\t#{desc}"
     puts "#{time[0, 10]}\thref: #{href}"

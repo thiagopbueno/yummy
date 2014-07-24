@@ -25,7 +25,7 @@ class DeliciousAPI
 		start = 0
 
 		posts = get_posts tags, 1000, start, nil, nil
-		posts = posts[:posts]
+		posts = posts["posts"]
 
 		while posts.size > 0
 
@@ -33,7 +33,7 @@ class DeliciousAPI
 
 			start += 1000
 			posts = get_posts tags, 1000, start, nil, nil
-			posts = posts[:posts]
+			posts = posts["posts"]
 		end
 
 		all_posts
@@ -86,23 +86,23 @@ class DeliciousAPI
 		# doc.write(out, 4)
 	  	# puts out
 
-	    user = {
-	    	:user  => doc.elements[1].attributes["user"],
-	    	:total => doc.elements[1].attributes["total"],
-	    	:tag   => doc.elements[1].attributes["tag"]
-	    }
+		info = {
+			"user"  => doc.elements[1].attributes["user"],
+			"total" => doc.elements[1].attributes["total"],
+			"tag"   => doc.elements[1].attributes["tag"]
+		}
 
 	    posts = {}
 	    doc.elements.each("posts/post") do |element|
-	      posts[element.attributes["hash"]] = {
-	      	:desc => element.attributes["description"],
-	      	:href => element.attributes["href"],
-	      	:tags => element.attributes["tag"],
-	      	:dt   => element.attributes["time"]
-	      }
+			posts[element.attributes["hash"]] = {
+				"desc" => element.attributes["description"],
+				"href" => element.attributes["href"],
+				"tags" => element.attributes["tag"],
+				"dt"   => element.attributes["time"]
+			}
     	end
 
-    	{:info => user, :posts => posts}
+		{"info" => info, "posts" => posts}
 	end
 
 	# /v1/posts/dates?
