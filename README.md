@@ -23,11 +23,10 @@ Create a config.yml file containing your **ACCESS_TOKEN** and run bundle install
 
 ### Usage
 
-`$ ./yummy [OPTIONS]`
+`$ ./yummy (posts|backup|tags|dates) [OPTIONS]`
 
 **OPTIONS**
 
-    -o, --object (tags|posts|dates)  Choose between list of 'tags', 'posts' or 'posts/dates'
     -t, --tags tag1+tag2+...         Set list of tags (separated by '+') for posts
     -n, --max MAX                    Set maximum number of tags/posts
     -s, --start-date START_DATE      Set start date for all API requests
@@ -35,6 +34,26 @@ Create a config.yml file containing your **ACCESS_TOKEN** and run bundle install
     -h, --help                       Display this information
 
 All dates must be provided in the format 'YYYY-MM-DD'
+
+**EXAMPLES**
+
+Get list of 100 recent posts for tag 'ruby' from '2014-01-01'
+
+`$ ./yummy posts -t ruby -n 100 -s 2014-01-01`
+
+Save backup of all posts
+
+`$ ./yummy backup`
+
+Get list of tags with most posts
+
+`$ ./yummy tags`
+
+Get list of dates and post counts
+
+`$ ./yummy dates`
+
+
 
 
 ### Getting your ACCESS_TOKEN
