@@ -8,16 +8,12 @@ require_relative 'lib/delicious'
 
 # Parse command line options
 
-options = {:object => "posts", :tags => nil, :max => 5}
+options = {:object => "posts", :tags => nil, :max => 10}
 
 opt_parser = OptionParser.new do |opts|
-  opts.banner =   "Usage: ./yummy [OPTIONS]"
+  opts.banner =   "Usage: ./yummy (posts|tags|dates|backup) [OPTIONS]"
   opts.separator  ""
   opts.separator  "OPTIONS"
-
-  opts.on("-o", "--object (tags|posts|dates)", "Choose between list of 'tags', 'posts' or 'posts/dates'") do |d|
-    options[:object] = d
-  end
 
   opts.on("-t", "--tags tag1+tag2+...", "Set list of tags (separated by '+') for posts") do |d|
     options[:tags] = d
@@ -42,6 +38,19 @@ opt_parser = OptionParser.new do |opts|
 
   opts.separator  ""
   opts.separator  "** All dates must be provided in the format `YYYY-MM-DD'"
+  opts.separator  ""
+  opts.separator  "EXAMPLES"
+  opts.separator  "# Get list of 100 recent posts for tag 'ruby'"
+  opts.separator  "./yummy posts -t ruby -n 100"
+  opts.separator  ""
+  opts.separator  "# Get list of tags with most posts"
+  opts.separator  "./yummy tags"
+  opts.separator  ""
+  opts.separator  "# Get list of dates and post counts"
+  opts.separator  "./yummy dates"
+  opts.separator  ""
+  opts.separator  "# Save backup of all posts"
+  opts.separator  "./yummy backup"
   opts.separator  ""
 end
 opt_parser.parse!
