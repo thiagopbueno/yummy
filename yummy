@@ -153,9 +153,9 @@ elsif options[:object] == "backup"
     tags = post[:tags]
     time = post[:dt]
 
-    puts "[#{i}]\t#{desc} @ #{time}"
-    puts "\thref: #{href}"
-    puts "\ttags: #{tags}"
+    puts "[#{i}]\t\t#{desc}"
+    puts "#{time[0, 10]}\thref: #{href}"
+    puts "#{time[11..-1]}\ttags: #{tags}"
     puts
 
     i += 1
