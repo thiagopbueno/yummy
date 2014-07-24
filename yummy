@@ -141,7 +141,7 @@ elsif options[:object] == "posts"
     i += 1
   end
 
-  puts "Found (#{i-1}) posts for tag(s) `#{options[:tags]}'."
+  puts "Found (#{i-1}) posts for tag(s) `#{options[:tags]}'." if options[:tags]
   puts "URL: #{uri}"
   puts
 
