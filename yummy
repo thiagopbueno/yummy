@@ -5,9 +5,9 @@ require 'yaml'
 require 'optparse'
 
 require_relative 'lib/delicious'
+require_relative 'lib/services/manager'
 
 # Parse command line options
-
 options = {:object => "posts", :tags => nil, :max => 10}
 
 opt_parser = OptionParser.new do |opts|
@@ -55,9 +55,7 @@ opt_parser = OptionParser.new do |opts|
 end
 opt_parser.parse!
 
-# puts ARGV[0]
-# puts ARGV[1]
-
+# Get user command
 command = ARGV[0]
 
 case command
@@ -74,7 +72,6 @@ else
   exit -1
 end
 
-
 # Greet user
 puts "Hello, Yummy! You're just looking delicious ..."
 puts
@@ -87,95 +84,11 @@ rescue ArgumentError => e
 end
 
 # Initialize DeliciousAPI wrapper
-manager = DeliciousAPI.new(config['ACCESS_TOKEN'])
+delicious = DeliciousAPI.new(config['ACCESS_TOKEN'])
 
-# Print results
-if options[:object] == "tags"
-  uri  = manager.get_tags_uri
-  tags = manager.get_tags
+# Initialize service
+service = ServiceFactory.build(options[:object], delicious, options)
 
-  exit -1 if tags.nil?
-
-  i = 1
-  tags.each do |tag, count|
-    puts "[#{i}]\tcount: #{count}\ttag: #{tag}" unless i > options[:max]
-    i += 1
-  end
-
-  n = i < options[:max] ? i : options[:max]
-  puts
-  puts "Found (#{i-1}) tags. Shown only first (#{n})."
-  puts "URL: #{uri}"
-  puts
-
-elsif options[:object] == "dates"
-  uri   = manager.get_posts_dates_uri options[:tags]
-  dates = manager.get_posts_dates options[:tags]
-
-  exit -1 if dates.nil?
-
-  i = 1
-  dates.sort{|a, b| b <=> a}.each do |dt, count|
-    puts "[#{i}]\tdate: #{dt}\tcount: #{count}" unless i > options[:max]
-    i += 1
-  end
-
-  n = i < options[:max] ? i : options[:max]
-  puts
-  puts "Found (#{i-1}) post dates. Shown only first (#{n})."
-  puts "URL: #{uri}"
-  puts
-
-elsif options[:object] == "posts"
-  uri   = manager.get_posts_uri(options[:tags], options[:max], nil, options[:start], options[:end])
-  posts = manager.get_posts(options[:tags], options[:max], nil, options[:start], options[:end])
-
-  exit -1 if posts.nil?
-
-  puts "User `#{posts["info"]["user"]}' has #{posts["info"]["total"]} posts." unless options[:tags]
-  puts
-
-  i = 1
-  posts["posts"].each do |hash, post|
-    desc = post["desc"]
-    href = post["href"]
-    tags = post["tags"]
-    time = post["dt"]
-
-    puts "[#{i}]\t\t#{desc}"
-    puts "#{time[0, 10]}\thref: #{href}"
-    puts "#{time[11..-1]}\ttags: #{tags}"
-    puts
-
-    i += 1
-  end
-
-  puts "Found (#{i-1}) posts for tag(s) `#{options[:tags]}'." if options[:tags]
-  puts "URL: #{uri}"
-  puts
-
-elsif options[:object] == "backup"
-  posts = manager.get_all_posts options[:tags]
-
-  File.open("delicious-backup-#{Time.now.strftime("%F_%H-%M-%S")}.yml", "w") do |f|
-    f.write(posts.to_yaml)
-  end
-
-  i = 1
-  posts.each do |hash, post|
-    desc = post["desc"]
-    href = post["href"]
-    tags = post["tags"]
-    time = post["dt"]
-
-    puts "[#{i}]\t\t#{desc}"
-    puts "#{time[0, 10]}\thref: #{href}"
-    puts "#{time[11..-1]}\ttags: #{tags}"
-    puts
-
-    i += 1
-  end
-
-  puts "Found (#{i-1}) posts."
-  puts
-end
+# Execute service
+manager = ServiceManager.new(service)
+manager.execute
