@@ -57,17 +57,7 @@ opt_parser.parse!
 
 # Get user command
 command = ARGV[0]
-
-case command
-when "backup"
-  options[:object] = "backup"
-when "dates"
-  options[:object] = "dates"
-when "tags"
-  options[:object] = "tags"
-when "posts"
-  options[:object] = "posts"
-else
+if not ["posts", "tags", "dates", "backup"].include? command
   puts "yummy: don't know how to `#{command}'"
   exit -1
 end
@@ -87,7 +77,7 @@ end
 delicious = DeliciousAPI.new(config['ACCESS_TOKEN'])
 
 # Initialize service
-service = ServiceFactory.build(options[:object], delicious, options)
+service = ServiceFactory.build(command, delicious, options)
 
 # Execute service
 manager = ServiceManager.new(service)
