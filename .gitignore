@@ -1,4 +1,5 @@
 *.yml
+*.json
 *.log
 *.gem
 *.rbc
