@@ -94,7 +94,7 @@ class DeliciousAPI
 			posts[element.attributes["hash"]] = {
 				"desc" => element.attributes["description"],
 				"href" => element.attributes["href"],
-				"tags" => element.attributes["tag"],
+				"tags" => element.attributes["tag"].downcase().split(),
 				"dt"   => element.attributes["time"]
 			}
     	end
