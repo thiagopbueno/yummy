@@ -8,7 +8,7 @@ require_relative 'lib/delicious'
 require_relative 'lib/services/manager'
 
 # Parse command line options
-options = {:object => "posts", :tags => nil, :max => 10}
+options = {:object => "posts", :tags => nil, :max => 10, :format => :json}
 
 opt_parser = OptionParser.new do |opts|
   opts.banner =   "Usage: ./yummy (posts|tags|dates|backup) [OPTIONS]"
@@ -29,6 +29,10 @@ opt_parser = OptionParser.new do |opts|
 
   opts.on("-e", "--end-date END_DATE", "Set end date for all API requests") do |d|
     options[:end] = Date.parse(d).strftime("%FT%TZ")
+  end
+
+  opts.on("-f", "--format (json|yaml)", "Backup format") do |d|
+    options[:format] = d.to_sym
   end
 
   opts.on("-h", "--help", "Display this information") do

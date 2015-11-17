@@ -1,3 +1,5 @@
+require 'json'
+
 class DeliciousBackupService
 
 	attr_reader :delicious_api, :options
@@ -13,8 +15,14 @@ class DeliciousBackupService
 	def get_delicious_data
 		posts = delicious_api.get_all_posts options[:tags]
 
-		File.open("delicious-backup-#{Time.now.strftime("%F_%H-%M-%S")}.yml", "w") do |f|
-			f.write(posts.to_yaml)
+		if options[:format] == :yaml
+			File.open("delicious-backup-#{Time.now.strftime("%F_%H-%M-%S")}.yml", "w") do |f|
+				f.write(posts.to_yaml)
+			end
+		elsif options[:format] == :json
+			File.open("delicious-backup-#{Time.now.strftime("%F_%H-%M-%S")}.json", "w") do |f|
+				f.write(JSON.pretty_generate(posts))
+			end
 		end
 
 		{
