@@ -31,6 +31,7 @@ Create a config.yml file containing your **ACCESS_TOKEN** and run bundle install
     -n, --max MAX                    Set maximum number of tags/posts
     -s, --start-date START_DATE      Set start date for all API requests
     -e, --end-date END_DATE          Set end date for all API requests
+    -f, --format (json|yaml)         Backup format
     -h, --help                       Display this information
 
 All dates must be provided in the format 'YYYY-MM-DD'
